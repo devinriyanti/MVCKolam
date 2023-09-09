@@ -70,7 +70,10 @@ class ProfileFragment : Fragment(), ProfilView {
                 }
                 create().show()
             }
-
+        }
+        b.btnEditPwd.setOnClickListener {
+            val action = ProfileFragmentDirections.actionPasswordEditFragment()
+            Navigation.findNavController(it).navigate(action)
         }
     }
 

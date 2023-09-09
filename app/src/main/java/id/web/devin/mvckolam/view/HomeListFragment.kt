@@ -102,6 +102,14 @@ class HomeListFragment : Fragment(), KolamView {
         if(!kolam.isNullOrEmpty()){
             kolamListAdapter.updateKolamList(kolam)
             b.txtKolamTersedia.text = ""
+            if(kolam.size >= 1){
+                b.fabTambahKolam.isEnabled = false
+            }else{
+                b.fabTambahKolam.setOnClickListener {
+                    val action = HomeListFragmentDirections.actionKolamAddFragment()
+                    Navigation.findNavController(it).navigate(action)
+                }
+            }
         }else{
             kolamListAdapter.updateKolamList(emptyList())
             b.txtKolamTersedia.text = "Tidak Ada Kolam"
