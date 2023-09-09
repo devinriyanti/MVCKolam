@@ -13,17 +13,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.Navigation
 import id.web.devin.mvckolam.controller.AuthController
 import id.web.devin.mvckolam.controller.ProfileController
 import id.web.devin.mvckolam.databinding.FragmentLoginBinding
 import id.web.devin.mvckolam.model.Pengguna
 import id.web.devin.mvckolam.model.Role
-import id.web.devin.mvckolam.util.AuthControllerListener
+import id.web.devin.mvckolam.util.AuthView
 import id.web.devin.mvckolam.util.EncryptionUtils
 import id.web.devin.mvckolam.util.Global
-import id.web.devin.mvckolam.util.ProfileControllerListener
+import id.web.devin.mvckolam.util.ProfilView
 
-class LoginFragment : Fragment(), AuthControllerListener, ProfileControllerListener {
+class LoginFragment : Fragment(), AuthView, ProfilView {
     private lateinit var b:FragmentLoginBinding
     private lateinit var cAuth:AuthController
     private lateinit var cProfile: ProfileController
@@ -81,9 +82,13 @@ class LoginFragment : Fragment(), AuthControllerListener, ProfileControllerListe
                 }
             }
         }
+        b.btnDaftar.setOnClickListener {
+            val action = LoginFragmentDirections.actionDaftarSebagaiFragment()
+            Navigation.findNavController(it).navigate(action)
+        }
     }
 
-    override fun showProfile(profile: List<Pengguna>) {
+    override fun showProfil(profile: List<Pengguna>) {
         b.progressBarLogin.visibility = View.GONE
         profile.forEach {
             val role = it.role
@@ -121,14 +126,12 @@ class LoginFragment : Fragment(), AuthControllerListener, ProfileControllerListe
         }
     }
 
-    override fun updateProfil() {
-        //
-    }
-
     override fun showError(errorMessage: String) {
         b.txtCekLogin.text = "Email atau Katasandi Salah!"
         b.txtCekLogin.setTextColor(Color.RED)
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
     }
+
+    override fun success() {}
 
 }

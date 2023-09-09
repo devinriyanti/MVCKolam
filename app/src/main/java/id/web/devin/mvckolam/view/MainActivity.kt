@@ -18,9 +18,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.navHostMain) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.hostMainFragment) as NavHostFragment
         navController = navHostFragment.findNavController()
-        b.bottomNavMain.setupWithNavController(navController)
+        b.bottomNav.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {

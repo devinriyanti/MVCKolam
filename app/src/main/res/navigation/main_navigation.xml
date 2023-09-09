@@ -9,7 +9,13 @@
         android:id="@+id/itemRumah"
         android:name="id.web.devin.mvckolam.view.HomeListFragment"
         android:label="HomeListFragment"
-        tools:layout="@layout/fragment_home_list"/>
+        tools:layout="@layout/fragment_home_list">
+        <action
+            android:id="@+id/actionKolamAddFragment"
+            app:destination="@id/kolamAddFragment"
+            app:popUpTo="@id/kolamAddFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
     <fragment
         android:id="@+id/itemPembelian"
         android:name="id.web.devin.mvckolam.view.PembelianListFragment"
@@ -34,6 +40,11 @@
             android:id="@+id/actionProfilEditFragment"
             app:destination="@id/profilEditFragment"
             app:popUpTo="@id/profilEditFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/actionPasswordEditFragment"
+            app:destination="@id/passwordEditFragment"
+            app:popUpTo="@id/passwordEditFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
@@ -63,6 +74,28 @@
         tools:layout="@layout/fragment_profil_edit" >
         <action
             android:id="@+id/actionItemDataDiri"
+            app:destination="@id/itemDataDiri"
+            app:popUpTo="@id/itemDataDiri"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/kolamAddFragment"
+        android:name="id.web.devin.mvckolam.view.KolamAddFragment"
+        android:label="fragment_kolam_add"
+        tools:layout="@layout/fragment_kolam_add" >
+        <action
+            android:id="@+id/actionAddToItemRumah"
+            app:destination="@id/itemRumah"
+            app:popUpTo="@id/itemRumah"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordEditFragment"
+        android:name="id.web.devin.mvckolam.view.PasswordEditFragment"
+        android:label="fragment_password_edit"
+        tools:layout="@layout/fragment_password_edit" >
+        <action
+            android:id="@+id/actionEditPwdToItemDataDiri"
             app:destination="@id/itemDataDiri"
             app:popUpTo="@id/itemDataDiri"
             app:popUpToInclusive="true" />

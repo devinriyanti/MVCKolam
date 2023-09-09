@@ -6,16 +6,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import id.web.devin.mvckolam.controller.KolamController
 import id.web.devin.mvckolam.databinding.FragmentHomeListBinding
 import id.web.devin.mvckolam.model.Kolam
 import id.web.devin.mvckolam.model.Role
 import id.web.devin.mvckolam.util.Global
-import id.web.devin.mvckolam.util.KolamControllerListener
+import id.web.devin.mvckolam.util.KolamView
 import id.web.devin.mvvmkolam.view.KolamListAdapter
 
-class HomeListFragment : Fragment(), KolamControllerListener {
+class HomeListFragment : Fragment(), KolamView {
     private lateinit var b:FragmentHomeListBinding
     private lateinit var kolamListAdapter: KolamListAdapter
     private lateinit var cKolam:KolamController
@@ -32,11 +34,30 @@ class HomeListFragment : Fragment(), KolamControllerListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val role = Global.getRole(requireContext())
+        val email = Global.getEmail(requireContext())
         b.txtError.visibility = View.GONE
+        var cari =""
         if(role == Role.Admin.name){
+            cKolam.fetchKolamAdmin(email.toString(),role)
+            b.txtPencarianKolamHome.visibility = View.GONE
+            b.fabTambahKolam.visibility = View.VISIBLE
 
+            b.fabTambahKolam.setOnClickListener {
+                val action = HomeListFragmentDirections.actionKolamAddFragment()
+                Navigation.findNavController(it).navigate(action)
+            }
         }else{
-            cKolam.fetchKolam()
+            b.txtPencarianKolam.addTextChangedListener {
+                cari = b.txtPencarianKolam.text.toString()
+                if(cari != ""){
+                    cari = cari
+                }else{
+                    cari = ""
+                }
+                cKolam.fetchKolam(cari)
+            }
+            cKolam.fetchKolam(cari)
+            b.fabTambahKolam.visibility = View.GONE
         }
         b.refreshHome.setOnRefreshListener {
             b.recViewKolam.visibility = View.GONE
@@ -44,9 +65,19 @@ class HomeListFragment : Fragment(), KolamControllerListener {
             b.txtKolamTersedia.visibility = View.GONE
             b.progressLoad.visibility = View.VISIBLE
             if (role == Role.Admin.name){
-//                cKolam.fetchKolamAdmin(email,it.role.toString())
+                cKolam.fetchKolamAdmin(email!!,role.toString())
+                b.txtPencarianKolamHome.visibility = View.GONE
             }else{
-                cKolam.fetchKolam()
+                b.txtPencarianKolam.addTextChangedListener {
+                    cari = b.txtPencarianKolam.text.toString()
+                    if(cari != ""){
+                        cari = cari
+                    }else{
+                        cari = ""
+                    }
+                    cKolam.fetchKolam(cari)
+                }
+                cKolam.fetchKolam(cari)
             }
             b.refreshHome.isRefreshing = false
         }
@@ -72,7 +103,10 @@ class HomeListFragment : Fragment(), KolamControllerListener {
             kolamListAdapter.updateKolamList(kolam)
             b.txtKolamTersedia.text = ""
         }else{
+            kolamListAdapter.updateKolamList(emptyList())
             b.txtKolamTersedia.text = "Tidak Ada Kolam"
         }
     }
+
+    override fun success() {}
 }

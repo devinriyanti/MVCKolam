@@ -1,59 +1,89 @@
 package id.web.devin.mvckolam.controller
 
 import android.content.Context
-import android.util.Log
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import id.web.devin.mvckolam.model.Pengguna
+import id.web.devin.mvckolam.model.ProductModel
 import id.web.devin.mvckolam.model.Produk
-import id.web.devin.mvckolam.util.ProductControllerListener
-import org.json.JSONObject
+import id.web.devin.mvckolam.util.ProductView
 
-class ProductController (val context: Context, private val listener: ProductControllerListener) {
-    private val TAG = "volleyTAG"
-    private var queue: RequestQueue?= null
+class ProductController (val context: Context, private val view: ProductView) {
+    private val productModel = ProductModel(context)
 
     fun fetchProduct(idProduk:String){
-        queue = Volley.newRequestQueue(context)
-        var url = "https://lokowai.shop/productdetail.php?id=$idProduk"
-        val stringReq = StringRequest(Request.Method.GET,url,
-            {response->
-                Log.d("successProduk", response.toString())
-                val produk = parseProduk(response)
-                Log.d("success", produk.toString())
-                listener.showProduk(produk)
-            },
-            {error->
-                Log.d("errorProduk", error.toString())
-                listener.showError(error.toString())
+        productModel.fetchProduct(idProduk,object :ProductModel.ProductCallback{
+            override fun onProductLoaded(productList: List<Produk>) {
+                view.showProduk(productList)
             }
-        ).apply {
-            tag = "TAG"
-        }
-        queue?.add(stringReq)
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+            override fun onSuccess() {}
+        })
     }
 
-    private fun parseProduk(response: String?): List<Produk> {
-        val produkList = mutableListOf<Produk>()
+    fun insertProduct(
+        nama: String,
+        deskripsi: String,
+        qty: Int,
+        harga: Double,
+        diskon: Double,
+        gambar:String,
+        berat:Int,
+        idkolam:String
+    ){
+        productModel.insertProduct(nama,deskripsi,qty,harga,diskon,gambar,berat,idkolam,object :ProductModel.ProductCallback{
+            override fun onProductLoaded(productList: List<Produk>) {}
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+            override fun onSuccess() {
+                view.success()
+            }
+        })
+    }
 
-        val produkJSON=JSONObject(response)
-        val idproduk = produkJSON.getString("id")
-        val kolam = produkJSON.getString("idkolam")
-        val nama = produkJSON.getString("nama")
-        val kota = produkJSON.getString("kota")
-        val deskripsi = produkJSON.getString("deskripsi")
-        val qty = produkJSON.optInt("kuantitas")
-        val harga = produkJSON.optDouble("harga")
-        val diskon = produkJSON.optDouble("diskon")
-        val gambarUrl = produkJSON.getString("gambar")
-        val berat = produkJSON.optDouble("berat")
+    fun updateProduk(
+        nama: String,
+        deskripsi: String,
+        qty: Int,
+        harga: Double,
+        diskon: Double,
+        berat:Int,
+        idproduk:String
+    ){
+        productModel.updateProduk(nama,deskripsi,qty,harga,diskon,berat,idproduk,object :ProductModel.ProductCallback{
+            override fun onProductLoaded(productList: List<Produk>) {}
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+            override fun onSuccess() {
+                view.success()
+            }
+        })
+    }
 
-        val produk = Produk(idproduk, kolam, nama, kota, deskripsi, qty, harga, diskon, gambarUrl, berat)
-        produkList.add(produk)
+    fun updateStatus(status:Int, idproduk: String){
+        productModel.updateStatus(status,idproduk,object : ProductModel.ProductCallback{
+            override fun onProductLoaded(productList: List<Produk>) {}
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+            override fun onSuccess() {
+                view.success()
+            }
+        })
+    }
 
-        return produkList
+    fun removeProduk(idproduk:String){
+        productModel.removeProduk(idproduk,object :ProductModel.ProductCallback{
+            override fun onProductLoaded(productList: List<Produk>) {}
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+            override fun onSuccess() {
+                view.success()
+            }
+
+        })
     }
 }
 

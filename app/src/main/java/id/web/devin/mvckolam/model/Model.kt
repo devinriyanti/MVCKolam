@@ -1,7 +1,20 @@
 package id.web.devin.mvckolam.model
 
 import com.google.gson.annotations.SerializedName
+data class Provinsi(
+    val idprovinsi:Int,
+    val nama:String,
+    val kota:ArrayList<Kota>
+)
 
+data class Kota (
+    val idkota:Int,
+    @SerializedName("nama_kota")
+    val nama: String,
+    @SerializedName("type")
+    val tipe:String,
+    val kode_pos:String
+)
 data class Pelatih(
     val id:String?,
     val nama:String?,
@@ -12,7 +25,7 @@ data class Pelatih(
     val tglKarir:String?,
     val deskripsi:String?,
     val jenis_kelamin: String?,
-    @SerializedName("gambar")
+    @SerializedName("url_gambar")
     val gambarUrl: String?
 )
 
@@ -27,24 +40,10 @@ data class Produk(
     var qty: Int?,
     val harga:Double?,
     val diskon:Double?,
-    @SerializedName("gambar")
+    @SerializedName("url_gambar")
     val gambarUrl: String?,
-    val berat:Double?
-)
-
-data class Tiket(
-    val idproduk:String?,
-    val idkolam:String?,
-    val nama:String?,
-    val kota: String?,
-    val deskripsi: String?,
-    @SerializedName("kuantitas")
-    val qty: Double?,
-    val harga:Double?,
-    val diskon:Double?,
-    @SerializedName("gambar")
-    val gambarUrl: String?,
-    val berat:Double?
+    val berat:Int?,
+    val status:String?
 )
 
 data class Kolam(
@@ -52,16 +51,17 @@ data class Kolam(
     val nama: String?,
     val alamat: String?,
     val deskripsi: String?,
-    @SerializedName("gambar")
+    @SerializedName("url_gambar")
     val gambarUrl: String?,
     val is_maintenance: String?,
+    val status:String?,
     val kota: String?,
+    @SerializedName("url_lokasi")
     val lokasi:String?,
     @SerializedName("email_pengguna")
     val admin: String?,
     @SerializedName("product")
     val produk:ArrayList<Produk>,
-    val tiket:ArrayList<Tiket>,
     val pelatih:ArrayList<Pelatih>
 )
 
@@ -92,10 +92,6 @@ data class Transaction(
     val status:StatusTransaksi,
     val produk: ArrayList<ProductTransaction>
 )
-data class UploadResponse(
-    val message: String,
-    val imageUrl: String
-)
 
 data class ProductTransaction(
     val id: String,
@@ -118,14 +114,14 @@ data class ProductTransaction(
     val qty: Int,
     val harga: Double,
     val diskon: Double,
-    val berat: Double,
+    val berat: Int,
+    @SerializedName("url_gambar")
     val gambar: String
 )
 
 data class Cart(
     @SerializedName("IdKolam")
     val id:String,
-    @SerializedName("namaKolam")
     val nama:String,
     val idkota:String,
     val produk: ArrayList<ProdukCart>
@@ -142,9 +138,16 @@ data class ProdukCart(
     val harga:Double,
     val qty: Int,
     val diskon: Double,
+    @SerializedName("url_gambar")
     val gambar:String,
-    val berat:Double,
-    val norekening:String
+    val berat:Int,
+    val norekening:String,
+    val nama_rekening: String?
+)
+
+data class UploadResponse(
+    val result: String,
+    val message:String
 )
 
 data class ShippingCostRequest(

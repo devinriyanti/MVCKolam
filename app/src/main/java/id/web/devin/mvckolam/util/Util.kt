@@ -10,10 +10,18 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import id.web.devin.mvckolam.R
 import id.web.devin.mvckolam.model.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 import java.lang.Exception
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.text.NumberFormat
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
@@ -29,7 +37,7 @@ fun ImageView.loadImage(url:String, progressBar: ProgressBar){
         .resize(1000,1300)
         .centerCrop()
         .error(R.drawable.baseline_error_24)
-        .into(this, object : Callback {
+        .into(this, object :Callback{
             override fun onSuccess() {
                 progressBar.visibility = View.GONE
             }
@@ -37,6 +45,44 @@ fun ImageView.loadImage(url:String, progressBar: ProgressBar){
                 progressBar.visibility = View.GONE
             }
         })
+}
+
+fun calculateTimeDifference(targetDateTime: LocalDateTime): Duration {
+    val currentDateTime = LocalDateTime.now()
+    return Duration.between(currentDateTime, targetDateTime)
+}
+fun SisaWaktu(tanggal:String):Long{
+    val targetDateTimeString = add24HoursToDateTime(tanggal)
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val targetDateTime = LocalDateTime.parse(targetDateTimeString, formatter)
+
+    // Hitung sisa waktu
+    val timeDifference = calculateTimeDifference(targetDateTime)
+
+    // Output sisa waktu dalam format jam, menit, dan detik
+    val hours = timeDifference.toHours()
+    val minutes = (timeDifference.toMinutes() % 60).toInt()
+    val seconds = (timeDifference.seconds % 60).toInt()
+    var milidetik = hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000
+
+    return milidetik
+}
+
+fun add24HoursToDateTime(inputDateTime: String): String {
+    // Tentukan format tanggal dan waktu yang sesuai
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
+    // Parse inputDateTime menjadi objek Date
+    val date = inputFormat.parse(inputDateTime)
+
+    // Tambahkan 24 jam ke objek Date
+    val calendar = Calendar.getInstance()
+    calendar.time = date
+    calendar.add(Calendar.HOUR_OF_DAY, 24)
+
+    // Format kembali objek Date ke string
+    val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return outputFormat.format(calendar.time)
 }
 
 fun formatCurrency(amount: Double): String {
@@ -112,37 +158,80 @@ object Global {
     }
 }
 
-interface AuthControllerListener {
-    fun showError(message: String)
+interface RajaOngkirService {
+    @POST("cost")
+    fun calculateShippingCosts(@Body request: ShippingCostRequest): Call<ShippingResponse>
 }
 
-interface KolamControllerListener {
+interface UploadService {
+    @Multipart
+    @POST("uploadgambar.php")
+    fun uploadImage(@Part image: MultipartBody.Part, @Part("folder") folder: RequestBody): Call<UploadResponse>
+}
+
+interface AuthView {
+    fun showError(message: String)
+    fun  success()
+}
+
+interface KolamView {
+    fun showError(message: String)
+    fun showKolam(kolam: List<Kolam>)
+    fun success()
+}
+
+interface KolamDetailView {
     fun showError(message: String)
     fun showKolam(kolam: List<Kolam>)
 }
 
-interface KolamDetailControllerListener {
-    fun showError(message: String)
-    fun showKolam(kolam: List<Kolam>)
-}
-
-interface PelatihControllerListener {
+interface PelatihView {
     fun showError(message: String)
     fun showPelatih(pelatih: List<Pelatih>)
+    fun succes()
 }
 
-interface ProductControllerListener {
+interface ProductView {
     fun showError(message: String)
     fun showProduk(produk: List<Produk>)
+    fun success()
 }
 
-interface ProfileControllerListener {
+interface ProfilView{
     fun showError(message: String)
-    fun showProfile(profileData: List<Pengguna>)
-    fun updateProfil()
+    fun showProfil(profile: List<Pengguna>)
+    fun success()
 }
 
-interface TransaksiControllerListener {
+interface TransaksiView {
     fun showError(message: String)
     fun showTransaksi(transaksi: List<Transaction>)
+    fun success()
 }
+
+interface CartView {
+    fun showError(message: String)
+    fun showCart(cart: List<Cart>)
+    fun success()
+}
+
+interface CartDetailView {
+    fun showError(message: String)
+    fun showCart(cart: List<Cart>)
+}
+
+interface ShippingView {
+    fun showError(message: String)
+    fun showShipping(shipping: ShippingResponse?)
+}
+
+interface UploadView {
+    fun uploadError(message: String)
+    fun UploadSuccess(upload: UploadResponse)
+}
+
+interface ProvinsiView {
+    fun showError(message: String)
+    fun showProvinsi(provinsi: List<Provinsi>)
+}
+

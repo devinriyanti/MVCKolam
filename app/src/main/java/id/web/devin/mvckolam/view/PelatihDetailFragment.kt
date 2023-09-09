@@ -1,21 +1,30 @@
 package id.web.devin.mvckolam.view
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.text.Layout
+import android.text.SpannableString
+import android.text.style.AlignmentSpan
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import id.web.devin.mvckolam.controller.PelatihController
 import id.web.devin.mvckolam.databinding.FragmentPelatihDetailBinding
 import id.web.devin.mvckolam.model.Pelatih
-import id.web.devin.mvckolam.util.PelatihControllerListener
+import id.web.devin.mvckolam.model.Role
+import id.web.devin.mvckolam.util.Global
+import id.web.devin.mvckolam.util.PelatihView
 import id.web.devin.mvckolam.util.calculateTotalYears
 import id.web.devin.mvckolam.util.loadImage
 
-class PelatihDetailFragment : Fragment(), PelatihControllerListener {
+class PelatihDetailFragment : Fragment(), PelatihView {
     private lateinit var b:FragmentPelatihDetailBinding
     private lateinit var cPelatih:PelatihController
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -28,9 +37,48 @@ class PelatihDetailFragment : Fragment(), PelatihControllerListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val role = context?.let { Global.getRole(it) }
+        if(role == Role.Admin.name){
+            b.btnEditPelatihDetail.visibility = View.VISIBLE
+            b.btnHapusPelatih.visibility = View.VISIBLE
+        }else{
+            b.btnEditPelatihDetail.visibility = View.GONE
+            b.btnHapusPelatih.visibility = View.GONE
+        }
+
         if(arguments != null){
             val pelatihID = PelatihDetailFragmentArgs.fromBundle(requireArguments()).pelatihID
             cPelatih.fetchPelatih(pelatihID)
+
+            b.btnEditPelatihDetail.setOnClickListener {
+                val action = PelatihDetailFragmentDirections.actionPelatihEditFragment(pelatihID)
+                Navigation.findNavController(it).navigate(action)
+            }
+
+            b.btnHapusPelatih.setOnClickListener {
+                AlertDialog.Builder(context).apply {
+                    val title = SpannableString("Peringatan")
+                    title.setSpan(AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, title.length, 0)
+                    val message = SpannableString("Anda yakin ingin menghapus data pelatih?")
+                    message.setSpan(
+                        AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                        0,
+                        message.length,
+                        0
+                    )
+                    setTitle(title)
+                    setMessage(message)
+                    setPositiveButton("Ya"){ dialog,_->
+                        cPelatih.removePelatih(pelatihID )
+                        val action = PelatihDetailFragmentDirections.actionPDKolamDetailFragment()
+                        findNavController().navigate(action)
+                    }
+                    setNegativeButton("Tidak"){ dialog,_->
+                        dialog.dismiss()
+                    }
+                    create().show()
+                }
+            }
         }
     }
 
@@ -50,4 +98,6 @@ class PelatihDetailFragment : Fragment(), PelatihControllerListener {
             b.imagePelatihDetail.loadImage(it.gambarUrl.toString(),b.progressBarPelatihDetail)
         }
     }
+
+    override fun succes() {}
 }

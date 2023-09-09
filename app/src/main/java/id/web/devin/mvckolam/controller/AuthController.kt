@@ -1,37 +1,63 @@
 package id.web.devin.mvckolam.controller
 
 import android.content.Context
-import android.util.Log
 import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import id.web.devin.mvckolam.util.AuthControllerListener
+import id.web.devin.mvckolam.model.AuthModel
+import id.web.devin.mvckolam.util.AuthView
 
-class AuthController(private val context: Context, private val listener: AuthControllerListener) {
-    private val TAG = "volleyTAG"
-    private var queue: RequestQueue?= null
+class AuthController(private val context: Context, private val view: AuthView) {
 
-
+    private val authModel = AuthModel(context)
     fun loginUser(email:String, pwd:String){
-        queue = Volley.newRequestQueue(context)
-        val url = "https://lokowai.shop/login.php"
-        val stringReq = object : StringRequest(
-            Method.POST, url,
-            Response.Listener { response ->
-                Log.d("succesProfil", response.toString())
-            },
-            Response.ErrorListener {
-                Log.d("errorProfil", it.toString())
-                listener.showError("Gagal mengambil data pengguna")
-            }){
-            override fun getParams(): MutableMap<String, String> {
-                val params = HashMap<String, String>()
-                params["email"] = email
-                return params
+        authModel.loginUser(email,pwd,object :AuthModel.AuthCallback{
+            override fun onSuccess() {
+                view.success()
             }
-        }
-        stringReq.tag = TAG
-        queue?.add(stringReq)
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+        })
+    }
+
+    fun registerUser(
+        nama: String,
+        email: String,
+        alamat:String,
+        noTelp: String,
+        pwd: String,
+        role: String,
+        idkota:String
+    ){
+        authModel.registerUser(nama,email,alamat,noTelp,pwd,role,idkota,object :AuthModel.AuthCallback{
+            override fun onSuccess() {
+                view.success()
+            }
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+        })
+    }
+
+    fun registerAdmin(
+        nama: String,
+        email: String,
+        alamat:String,
+        norekening:String,
+        namarekening:String,
+        noTelp: String,
+        pwd: String,
+        role: String,
+        idkota:String
+    ){
+        authModel.registerAdmin(nama,email,alamat,norekening,namarekening,noTelp,pwd,role,idkota,object :AuthModel.AuthCallback{
+            override fun onSuccess() {
+                view.success()
+            }
+
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+        })
     }
 }
+

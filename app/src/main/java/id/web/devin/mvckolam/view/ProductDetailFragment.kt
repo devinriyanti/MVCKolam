@@ -7,27 +7,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import id.web.devin.mvckolam.R
+import androidx.navigation.Navigation
+import id.web.devin.mvckolam.controller.CartController
 import id.web.devin.mvckolam.controller.ProductController
 import id.web.devin.mvckolam.databinding.FragmentProductDetailBinding
+import id.web.devin.mvckolam.model.Cart
 import id.web.devin.mvckolam.model.Produk
 import id.web.devin.mvckolam.model.Role
-import id.web.devin.mvckolam.util.Global
-import id.web.devin.mvckolam.util.ProductControllerListener
-import id.web.devin.mvckolam.util.formatCurrency
-import id.web.devin.mvckolam.util.loadImage
+import id.web.devin.mvckolam.util.*
 
-class ProductDetailFragment : Fragment(), ProductControllerListener {
+class ProductDetailFragment : Fragment(), ProductView, CartView {
     private lateinit var b:FragmentProductDetailBinding
     private lateinit var cProduk:ProductController
-//    private val cartViewModel: CartViewModel by viewModels()
+    private lateinit var cCart:CartController
     private var idKolam:String? = null
     private var qty:Int? = 0
     private var total:Double? = null
     private var email:String? = null
     private var role:String? = null
+    private var produkID:String? = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +33,7 @@ class ProductDetailFragment : Fragment(), ProductControllerListener {
     ): View? {
         // Inflate the layout for this fragment
         cProduk = ProductController(this.requireContext(),this)
+        cCart = CartController(this.requireContext(),this)
         b = FragmentProductDetailBinding.inflate(layoutInflater)
         return b.root
     }
@@ -44,17 +43,32 @@ class ProductDetailFragment : Fragment(), ProductControllerListener {
         email = context?.let { Global.getEmail(it) }.toString()
         role = context?.let { Global.getRole(it) }.toString()
         if(arguments != null){
-            val produkID = ProductDetailFragmentArgs.fromBundle(requireArguments()).produkID
-            cProduk.fetchProduct(produkID)
+            produkID = ProductDetailFragmentArgs.fromBundle(requireArguments()).produkID
+            cProduk.fetchProduct(produkID.toString())
+            b.btnEditProdukDetail.setOnClickListener {
+                val action = ProductDetailFragmentDirections.actionProductEditFragment(produkID.toString())
+                Navigation.findNavController(it).navigate(action)
+            }
+
+            b.switchArsipProduk.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    cProduk.updateStatus(1,produkID.toString())
+                } else {
+                    cProduk.updateStatus(0,produkID.toString())
+                }
+            }
         }
     }
 
     override fun showError(message: String) {
+        b.progressBarDetailProduk.visibility = View.GONE
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun showProduk(produk: List<Produk>) {
+        b.progressBarDetailProduk.visibility = View.GONE
         produk.forEach {
+            b.switchArsipProduk.isChecked = it.status.equals("1")
             b.txtNamaProductDetail.text = it.nama
             val harga = it.harga?.let { it -> formatCurrency(it) }
             val diskon = it.diskon
@@ -78,18 +92,21 @@ class ProductDetailFragment : Fragment(), ProductControllerListener {
             if(role == Role.Admin.toString()){
                 b.btnTambahKeranjang.visibility = View.GONE
                 b.btnEditProdukDetail.visibility = View.VISIBLE
-                b.btnHapusProdukDetail.visibility = View.VISIBLE
+                b.switchArsipProduk.visibility = View.VISIBLE
             }else{
                 b.btnTambahKeranjang.visibility = View.VISIBLE
+                b.switchArsipProduk.visibility = View.GONE
                 b.btnTambahKeranjang.setOnClickListener {
                     qty = qty!! + 1 // salah, contoh aja
                     total = qty!! * (harga2!!-(harga2 * diskon!!/100))
-//                    cartViewModel.addToCart(idKolam!!, total!!,email!!, idproduk!!, qty!!, harga2, diskon)
+                    cCart.addToCart(idKolam!!, total!!,email!!, idproduk!!, qty!!, harga2, diskon)
                     Toast.makeText(context,"Berhasil Ditambahkan $qty", Toast.LENGTH_SHORT).show()
                 }
                 b.btnEditProdukDetail.visibility = View.GONE
-                b.btnHapusProdukDetail.visibility = View.GONE
             }
         }
     }
+
+    override fun success() {}
+    override fun showCart(cart: List<Cart>) {}
 }

@@ -13,10 +13,10 @@ import id.web.devin.mvckolam.model.Role
 import id.web.devin.mvckolam.model.StatusTransaksi
 import id.web.devin.mvckolam.model.Transaction
 import id.web.devin.mvckolam.util.Global
-import id.web.devin.mvckolam.util.TransaksiControllerListener
+import id.web.devin.mvckolam.util.TransaksiView
 import id.web.devin.mvvmkolam.view.PembelianListAdapter
 
-class DibatalkanFragment : Fragment(), TransaksiControllerListener {
+class DibatalkanFragment : Fragment(), TransaksiView {
     private lateinit var b:FragmentDibatalkanBinding
     private lateinit var pembelianListAdapter: PembelianListAdapter
     private lateinit var cTransaksi: TransaksiController
@@ -34,7 +34,7 @@ class DibatalkanFragment : Fragment(), TransaksiControllerListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        b.txtErrrorDibatalkan.visibility = View.GONE
+        b.txtErrorDibatalkan.visibility = View.GONE
         email = context?.let { Global.getEmail(it) }.toString()
         pembelianListAdapter = PembelianListAdapter(arrayListOf())
         val role = Global.getRole(requireContext())
@@ -49,26 +49,25 @@ class DibatalkanFragment : Fragment(), TransaksiControllerListener {
         if(message == "Tidak Ada Transaksi"){
             b.txtStatusDibatalkan.text = message
         }else{
-            b.txtErrrorDibatalkan.visibility = View.VISIBLE
+            b.txtErrorDibatalkan.visibility = View.VISIBLE
         }
         Log.d("eror",message)
         b.progressBarDibatalkan.visibility = View.GONE
     }
 
     override fun showTransaksi(transaksi: List<Transaction>) {
-        if(!transaksi.isNullOrEmpty()){
-            pembelianListAdapter.updateTransactionList(transaksi)
-            b.progressBarDibatalkan.visibility = View.GONE
-            transaksi.forEach {
-                if(!it.id.isNullOrEmpty()){
-                    b.recViewDibatalkan.layoutManager = LinearLayoutManager(context)
-                    b.recViewDibatalkan.adapter = pembelianListAdapter
-                }else{
-                    b.txtStatusDibatalkan.text = "Tidak Ada Transaksi"
-                }
+        transaksi.forEach {
+            if(it.id != "null"){
+                pembelianListAdapter.updateTransactionList(transaksi)
+                b.recViewDibatalkan.layoutManager = LinearLayoutManager(context)
+                b.recViewDibatalkan.adapter = pembelianListAdapter
+                b.progressBarDibatalkan.visibility = View.GONE
+            }else{
+                b.txtStatusDibatalkan.text = "Tidak Ada Transaksi"
+                b.progressBarDibatalkan.visibility = View.GONE
             }
-        }else{
-            b.txtStatusDibatalkan.text = "Tidak Ada Transaksi"
         }
     }
+
+    override fun success() {}
 }

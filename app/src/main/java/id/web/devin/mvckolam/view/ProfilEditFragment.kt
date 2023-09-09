@@ -13,23 +13,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import id.web.devin.mvckolam.R
 import id.web.devin.mvckolam.controller.ProfileController
 import id.web.devin.mvckolam.databinding.FragmentProfilEditBinding
 import id.web.devin.mvckolam.model.Gender
 import id.web.devin.mvckolam.model.Pengguna
 import id.web.devin.mvckolam.util.Global
-import id.web.devin.mvckolam.util.ProfileControllerListener
+import id.web.devin.mvckolam.util.ProfilView
 import id.web.devin.mvckolam.util.formatDate
 import id.web.devin.mvckolam.util.formatDate2
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ProfilEditFragment : Fragment(), ProfileControllerListener {
+class ProfilEditFragment : Fragment(), ProfilView {
     private lateinit var b:FragmentProfilEditBinding
     private lateinit var cProfile: ProfileController
     private lateinit var nama:String
@@ -65,7 +62,7 @@ class ProfilEditFragment : Fragment(), ProfileControllerListener {
         }
         cProfile.fetchProfil(email)
 
-        b.editTextTglLahirProfil.setOnClickListener {
+        b.txtTglLahirProfil.setOnClickListener {
             val today = Calendar.getInstance()
             val year = today.get(Calendar.YEAR)
             val month = today.get(Calendar.MONTH)
@@ -80,7 +77,7 @@ class ProfilEditFragment : Fragment(), ProfileControllerListener {
 
                         var dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
                         var str = dateFormat.format(calender.time)
-                        b.editTextTglLahirProfil.setText(str)
+                        b.txtTglLahirProfil.setText(str)
                     }, year, month, day)
             }
             picker?.show()
@@ -111,82 +108,27 @@ class ProfilEditFragment : Fragment(), ProfileControllerListener {
         }
 
         b.btnSimpanProfil.setOnClickListener {""
-            nama = b.editTextNamaProfil.text.toString()
-            noTelp = b.editTextTeleponProfil.text.toString()
-            alamat = b.editTextAlamatProfil.text.toString()
+            nama = b.txtNamaProfil.text.toString()
+            noTelp = b.txtTeleponProfil.text.toString()
+            alamat = b.txtAlamatProfil.text.toString()
             Log.d("gender",gender)
-            tglLahir = formatDate2(b.editTextTglLahirProfil.text.toString())
+            tglLahir = formatDate2(b.txtTglLahirProfil.text.toString())
             cProfile.updateUser(email,nama,alamat,noTelp,gender,tglLahir)
-        }
-    }
-
-    override fun showProfile(profile: List<Pengguna>) {
-        profile.forEach {
-            //Nama
-            if(!it.nama.isNullOrEmpty()){
-                b.editTextNamaProfil.setText(it.nama)
-            }else{
-                b.editTextNamaProfil.setHint("Belum Diatur")
-            }
-
-            //Email
-            if(!it.email.isNullOrEmpty()){
-                b.editTextEmailProfil.setText(it.email)
-            }else{
-                b.editTextEmailProfil.setHint("Belum Diatur")
-            }
-
-            //Telepon
-            if(!it.telepon.isNullOrEmpty()){
-                b.editTextTeleponProfil.setText(it.telepon)
-            }else{
-                b.editTextTeleponProfil.setHint("Belum Diatur")
-            }
-
-            //Alamat
-            if(!it.alamat.isNullOrEmpty()){
-                b.editTextAlamatProfil.setText(it.alamat)
-            }else{
-                b.editTextAlamatProfil.setHint("Belum Diatur")
-            }
-
-            //Jenis Kelamin
-            if(!it.jenis_kelamin.isNullOrEmpty()){
-                if(it.jenis_kelamin == Gender.Laki_Laki.displayText){
-                    b.spinnerGender.setSelection(1)
-                }else if(it.jenis_kelamin == Gender.Perempuan.displayText){
-                    b.spinnerGender.setSelection(2)
+            AlertDialog.Builder(context).apply {
+                val message = SpannableString("Data Diri Berhasil Diubah")
+                message.setSpan(
+                    AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                    0,
+                    message.length,
+                    0
+                )
+                setMessage(message)
+                setPositiveButton("OK") { _, _ ->
+                    val action = ProfilEditFragmentDirections.actionItemDataDiri()
+                    findNavController().navigate(action)
                 }
-
-            }else{
-                b.spinnerGender.setSelection(0)
+                create().show()
             }
-
-            //Tanggal Lahir
-            if(!it.tglLahir.isNullOrEmpty()){
-                val tgl = formatDate(it.tglLahir.toString())
-                b.editTextTglLahirProfil.setText(tgl)
-            }else{
-                b.editTextTglLahirProfil.setHint("Belum Diatur")
-            }
-        }
-    }
-
-    override fun updateProfil() {
-        AlertDialog.Builder(context).apply {
-            val message = SpannableString("Data Diri Berhasil Diubah")
-            message.setSpan(
-                AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
-                0,
-                message.length,
-                0
-            )
-            setMessage(message)
-            setPositiveButton("OK") { _, _ ->
-                val action = ProfilEditFragmentDirections.actionItemDataDiri()
-                findNavController().navigate(action)
-            }
-            create().show()
         }
     }
 
@@ -205,7 +147,57 @@ class ProfilEditFragment : Fragment(), ProfileControllerListener {
         }
     }
 
+    override fun showProfil(profile: List<Pengguna>) {
+        profile.forEach {
+            //Nama
+            if(!it.nama.isNullOrEmpty()){
+                b.txtNamaProfil.setText(it.nama)
+            }else{
+                b.txtNamaProfil.setHint("Belum Diatur")
+            }
 
+            //Email
+            if(!it.email.isNullOrEmpty()){
+                b.txtEmailProfil.setText(it.email)
+            }else{
+                b.txtEmailProfil.setHint("Belum Diatur")
+            }
 
+            //Telepon
+            if(!it.telepon.isNullOrEmpty()){
+                b.txtTeleponProfil.setText(it.telepon)
+            }else{
+                b.txtTeleponProfil.setHint("Belum Diatur")
+            }
 
+            //Alamat
+            if(!it.alamat.isNullOrEmpty()){
+                b.txtAlamatProfil.setText(it.alamat)
+            }else{
+                b.txtAlamatProfil.setHint("Belum Diatur")
+            }
+
+            //Jenis Kelamin
+            if(!it.jenis_kelamin.isNullOrEmpty()){
+                if(it.jenis_kelamin == Gender.Laki_Laki.displayText){
+                    b.spinnerGender.setSelection(1)
+                }else if(it.jenis_kelamin == Gender.Perempuan.displayText){
+                    b.spinnerGender.setSelection(2)
+                }
+
+            }else{
+                b.spinnerGender.setSelection(0)
+            }
+
+            //Tanggal Lahir
+            if(!it.tglLahir.isNullOrEmpty()){
+                val tgl = formatDate(it.tglLahir.toString())
+                b.txtTglLahirProfil.setText(tgl)
+            }else{
+                b.txtTglLahirProfil.setHint("Belum Diatur")
+            }
+        }
+    }
+
+    override fun success() {}
 }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import id.web.devin.mvckolam.databinding.PembelianListItemBinding
 import id.web.devin.mvckolam.model.Transaction
+import id.web.devin.mvckolam.view.PembelianDetailActivity
 
 class PembelianListAdapter(val transactionList:ArrayList<Transaction>):RecyclerView.Adapter<PembelianListAdapter.TransactionViewHolder>() {
     class TransactionViewHolder(val binding: PembelianListItemBinding):RecyclerView.ViewHolder(binding.root)
@@ -43,8 +44,8 @@ class PembelianListAdapter(val transactionList:ArrayList<Transaction>):RecyclerV
                 editor.putString("idtrx", transaksi.id)
                 editor.apply()
                 Log.d("isdh", transaksi.id)
-//                val intent = Intent(holder.itemView.context, PembelianDetailActivity::class.java)
-//                holder.itemView.context.startActivity(intent)
+                val intent = Intent(holder.itemView.context, PembelianDetailActivity::class.java)
+                holder.itemView.context.startActivity(intent)
             }
         }
     }

@@ -16,10 +16,10 @@
         android:theme="@style/Theme.MVCKolam"
         tools:targetApi="31">
         <activity
-            android:name=".PembelianDetailActivity"
+            android:name=".view.PembelianDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".CheckoutActivity"
+            android:name=".view.CheckoutActivity"
             android:exported="false" />
         <activity
             android:name=".view.KolamDetailActivity"

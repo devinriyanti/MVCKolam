@@ -1,55 +1,73 @@
 package id.web.devin.mvckolam.controller
 
 import android.content.Context
-import android.util.Log
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import id.web.devin.mvckolam.model.Pelatih
-import id.web.devin.mvckolam.util.PelatihControllerListener
-import org.json.JSONObject
+import id.web.devin.mvckolam.model.PelatihModel
+import id.web.devin.mvckolam.util.PelatihView
 
-class PelatihController(val context: Context, private val listener: PelatihControllerListener)  {
-    private val TAG = "volleyTAG"
-    private var queue: RequestQueue?= null
+class PelatihController(val context: Context, private val view: PelatihView)  {
+    private val pelatihModel = PelatihModel(context)
 
     fun fetchPelatih(idpelatih:String){
-        queue = Volley.newRequestQueue(context)
-        var url = "https://lokowai.shop/pelatihdetail.php?id=$idpelatih"
-        val stringReq = StringRequest(Request.Method.GET,url,
-            {response->
-                Log.d("successProduk", response.toString())
-                val produk = parsePelatih(response)
-                Log.d("success", produk.toString())
-                listener.showPelatih(produk)
-            },
-            {error->
-                Log.d("errorProduk", error.toString())
-                listener.showError(error.toString())
-            }
-        ).apply {
-            tag = "TAG"
-        }
-        queue?.add(stringReq)
+       pelatihModel.fetchPelatih(idpelatih,object :PelatihModel.PelatihCallback{
+           override fun onPelatihLoaded(pelatihList: List<Pelatih>) {
+               view.showPelatih(pelatihList)
+           }
+           override fun onError(errorMessage: String) {
+               view.showError(errorMessage)
+           }
+           override fun onSuccess() {}
+       })
     }
 
-    private fun parsePelatih(response: String?): List<Pelatih> {
-        val pelatihList = mutableListOf<Pelatih>()
+    fun insertPelatih(
+        nama: String,
+        tglLahir: String,
+        kontak: String,
+        tglKarir: String,
+        gambar:String,
+        deskripsi:String,
+        idkolam:String
+    ){
+       pelatihModel.insertPelatih(nama,tglLahir,kontak,tglKarir,gambar,deskripsi,idkolam,object :PelatihModel.PelatihCallback{
+           override fun onPelatihLoaded(pelatihList: List<Pelatih>) {}
+           override fun onError(errorMessage: String) {
+               view.showError(errorMessage)
+           }
+           override fun onSuccess() {
+               view.succes()
+           }
+       })
+    }
 
-        val pelatihJSON = JSONObject(response)
-        val id = pelatihJSON.getString("id")
-        val nama = pelatihJSON.getString("nama")
-        val tglLahir = pelatihJSON.getString("tanggal_lahir")
-        val kontak = pelatihJSON.getString("kontak")
-        val tglKarir = pelatihJSON.getString("mulai_karir")
-        val deskripsi = pelatihJSON.getString("deskripsi")
-        val jenisKelamin = pelatihJSON.getString("jenis_kelamin")
-        val gambarUrl = pelatihJSON.getString("gambar")
+    fun updatePelatih(
+        nama: String,
+        tglLahir: String,
+        kontak: String,
+        tglKarir: String,
+        deskripsi:String,
+        idkolam:String
+    ){
+        pelatihModel.updatePelatih(nama,tglLahir,kontak,tglKarir,deskripsi,idkolam,object : PelatihModel.PelatihCallback{
+            override fun onPelatihLoaded(pelatihList: List<Pelatih>) {}
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+            override fun onSuccess() {
+                view.succes()
+            }
+        })
+    }
 
-        val pelatih = Pelatih(id, nama, tglLahir, kontak, tglKarir, deskripsi, jenisKelamin, gambarUrl)
-        pelatihList.add(pelatih)
-
-        return pelatihList
+    fun removePelatih(idpelatih:String){
+        pelatihModel.removePelatih(idpelatih,object :PelatihModel.PelatihCallback{
+            override fun onPelatihLoaded(pelatihList: List<Pelatih>) {}
+            override fun onError(errorMessage: String) {
+                view.showError(errorMessage)
+            }
+            override fun onSuccess() {
+                view.succes()
+            }
+        })
     }
 }

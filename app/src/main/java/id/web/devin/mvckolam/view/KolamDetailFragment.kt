@@ -13,11 +13,11 @@ import com.google.android.material.tabs.TabLayoutMediator
 import id.web.devin.mvckolam.controller.KolamDetailController
 import id.web.devin.mvckolam.databinding.FragmentKolamDetailBinding
 import id.web.devin.mvckolam.model.Kolam
-import id.web.devin.mvckolam.util.KolamDetailControllerListener
+import id.web.devin.mvckolam.util.KolamDetailView
 import id.web.devin.mvckolam.util.loadImage
 import id.web.devin.mvvmkolam.view.MyPagerAdapter
 
-class KolamDetailFragment : Fragment(), KolamDetailControllerListener {
+class KolamDetailFragment : Fragment(), KolamDetailView {
     private lateinit var b:FragmentKolamDetailBinding
     private lateinit var navController: NavController
     private var kolamID:String? = null

@@ -2,7 +2,6 @@ package id.web.devin.mvckolam.view
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Layout
@@ -18,10 +17,10 @@ import id.web.devin.mvckolam.controller.ProfileController
 import id.web.devin.mvckolam.databinding.FragmentProfileBinding
 import id.web.devin.mvckolam.model.Pengguna
 import id.web.devin.mvckolam.util.Global
-import id.web.devin.mvckolam.util.ProfileControllerListener
+import id.web.devin.mvckolam.util.ProfilView
 import id.web.devin.mvckolam.util.formatDate
 
-class ProfileFragment : Fragment(), ProfileControllerListener {
+class ProfileFragment : Fragment(), ProfilView {
     private lateinit var b:FragmentProfileBinding
     private lateinit var cProfile:ProfileController
     override fun onCreateView(
@@ -75,32 +74,32 @@ class ProfileFragment : Fragment(), ProfileControllerListener {
         }
     }
 
-    override fun showProfile(profile: List<Pengguna>) {
+    override fun showProfil(profile: List<Pengguna>) {
         b.progressBarProfil.visibility = View.GONE
         profile.forEach {
             //Nama
-            if(!it.nama.isNullOrEmpty()){
+            if(!it.nama.equals("null")){
                 b.txtNamaProfil.setText(it.nama)
             }else{
                 b.txtNamaProfil.setText("Belum diatur")
             }
 
             //Email
-            if(!it.email.isNullOrEmpty()){
+            if(!it.email.equals("null")){
                 b.txtEmailProfil.setText(it.email)
             }else{
                 b.txtEmailProfil.setText("Belum diatur")
             }
 
             //Telepon
-            if(!it.telepon.isNullOrEmpty()){
+            if(!it.telepon.equals("null")){
                 b.txtTeleponProfil.setText(it.telepon)
             }else{
                 b.txtTeleponProfil.setText("Belum diatur")
             }
 
             //Alamat
-            if(!it.alamat.isNullOrEmpty()){
+            if(!it.alamat.equals("null")){
                 b.txtAlamatProfil.setText(it.alamat)
             }else{
                 b.txtAlamatProfil.setText("Belum diatur")
@@ -108,14 +107,14 @@ class ProfileFragment : Fragment(), ProfileControllerListener {
 
 //            Log.d("JenisK",it.jenis_kelamin.displayText)
             //Jenis Kelamin
-            if(!it.jenis_kelamin.isNullOrEmpty()){
+            if(!it.jenis_kelamin.equals("null")){
                 b.txtGenderProfil.setText(it.jenis_kelamin)
             }else{
                 b.txtGenderProfil.setText("Belum diatur")
             }
 
             //Tanggal Lahir
-            if(!it.tglLahir.isNullOrEmpty()){
+            if(!it.tglLahir.equals("null")){
                 val tgl = formatDate(it.tglLahir.toString())
                 b.txtTanggalLahir.setText(tgl)
             }else{
@@ -124,7 +123,7 @@ class ProfileFragment : Fragment(), ProfileControllerListener {
         }
     }
 
-    override fun updateProfil() {}
+    override fun success() {}
 
     override fun showError(errorMessage: String) {
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()

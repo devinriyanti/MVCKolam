@@ -13,10 +13,10 @@ import id.web.devin.mvckolam.model.Role
 import id.web.devin.mvckolam.model.StatusTransaksi
 import id.web.devin.mvckolam.model.Transaction
 import id.web.devin.mvckolam.util.Global
-import id.web.devin.mvckolam.util.TransaksiControllerListener
+import id.web.devin.mvckolam.util.TransaksiView
 import id.web.devin.mvvmkolam.view.PembelianListAdapter
 
-class DiterimaFragment : Fragment(), TransaksiControllerListener {
+class DiterimaFragment : Fragment(), TransaksiView {
     private lateinit var b: FragmentDiterimaBinding
     private lateinit var pembelianListAdapter: PembelianListAdapter
     private lateinit var cTransaksi: TransaksiController
@@ -56,20 +56,19 @@ class DiterimaFragment : Fragment(), TransaksiControllerListener {
     }
 
     override fun showTransaksi(transaksi: List<Transaction>) {
-        if(!transaksi.isNullOrEmpty()){
-            pembelianListAdapter.updateTransactionList(transaksi)
-            b.progressBarDiterima.visibility = View.GONE
-            transaksi.forEach {
-                if(!it.id.isNullOrEmpty()){
-                    b.recViewDiterima.layoutManager = LinearLayoutManager(context)
-                    b.recViewDiterima.adapter = pembelianListAdapter
-                }else{
-                    b.txtStatusDiterima.text = "Tidak Ada Transaksi"
-                }
+        transaksi.forEach {
+            if(it.id != "null"){
+                pembelianListAdapter.updateTransactionList(transaksi)
+                b.recViewDiterima.layoutManager = LinearLayoutManager(context)
+                b.recViewDiterima.adapter = pembelianListAdapter
+                b.progressBarDiterima.visibility = View.GONE
+            }else{
+                b.txtStatusDiterima.text = "Tidak Ada Transaksi"
+                b.progressBarDiterima.visibility = View.GONE
             }
-        }else{
-            b.txtStatusDiterima.text = "Tidak Ada Transaksi"
         }
     }
+
+    override fun success() {}
 
 }

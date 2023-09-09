@@ -16,8 +16,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         b = ActivityLoginBinding.inflate((layoutInflater))
         setContentView(b.root)
+        supportActionBar?.title = "LOKOWAI"
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.navHostLogin) as NavHostFragment
         navController = navHostFragment.findNavController()
         NavigationUI.setupActionBarWithNavController(this, navController)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return NavigationUI.navigateUp(navController,null)
     }
 }

@@ -22,11 +22,6 @@
         android:label="fragment_daftar_sebagai"
         tools:layout="@layout/fragment_daftar_sebagai" >
         <action
-            android:id="@+id/actionRegisPribadiFragment"
-            app:destination="@id/regisPribadiFragment"
-            app:popUpTo="@id/regisPribadiFragment"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/actionRegisBisnisFragment"
             app:destination="@id/regisBisnisFragment"
             app:popUpTo="@id/regisBisnisFragment"
@@ -34,6 +29,9 @@
         <action
             android:id="@+id/actionLoginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/actionRegisPribadiFragment"
+            app:destination="@id/regisPribadiFragment" />
     </fragment>
     <fragment
         android:id="@+id/regisPribadiFragment"

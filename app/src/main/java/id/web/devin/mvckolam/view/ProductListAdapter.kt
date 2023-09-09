@@ -1,16 +1,24 @@
 package id.web.devin.mvvmkolam.view
 
+import android.content.Context
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import id.web.devin.mvckolam.databinding.ProductListItemBinding
 import id.web.devin.mvckolam.model.Produk
+import id.web.devin.mvckolam.model.Role
+import id.web.devin.mvckolam.util.Global
 import id.web.devin.mvckolam.util.formatCurrency
 import id.web.devin.mvckolam.util.loadImage
 import id.web.devin.mvckolam.view.KolamDetailFragmentDirections
 
-class ProductListAdapter(val produkList:ArrayList<Produk>):RecyclerView.Adapter<ProductListAdapter.ProductViewHolder>() {
+class ProductListAdapter(private val context: Context, val produkList:ArrayList<Produk>):RecyclerView.Adapter<ProductListAdapter.ProductViewHolder>() {
     class ProductViewHolder(val b: ProductListItemBinding):RecyclerView.ViewHolder(b.root)
 
     fun updateProductList(newProductList:ArrayList<Produk>){
@@ -30,17 +38,51 @@ class ProductListAdapter(val produkList:ArrayList<Produk>):RecyclerView.Adapter<
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val produk = produkList[position]
+        val colorMatrix = ColorMatrix()
+        colorMatrix.setSaturation(0f)
+        val colorFilter = ColorMatrixColorFilter(colorMatrix)
+
         with(holder.b){
             txtNamaProduk.text = produk.nama
             val harga = produk?.harga?.let { formatCurrency(it) }
             txtHargaProduk.text = harga
             txtKota.text = produk.kota
             val id = produk.idproduk.toString()
+            val role = Global.getRole(context)
             imageProduct.loadImage(produk.gambarUrl.toString(), progressBarProduk)
 
-            cardViewProduk.setOnClickListener {
-                val action = KolamDetailFragmentDirections.actionProductDetailFragment(id)
-                Navigation.findNavController(it).navigate(action)
+            if(produk.qty == 0 && produk.status.equals("0")){
+                txtStatusProduk.visibility = View.VISIBLE
+                txtStatusProduk.setText("Produk Habis")
+                txtStatusProduk.setTextColor(Color.RED)
+                imageProduct.colorFilter = colorFilter
+                cardViewProduk.setOnClickListener {
+                    val action = KolamDetailFragmentDirections.actionProductDetailFragment(id)
+                    Navigation.findNavController(it).navigate(action)
+                }
+            }else{
+                txtStatusProduk.visibility = View.GONE
+                cardViewProduk.setOnClickListener {
+                    val action = KolamDetailFragmentDirections.actionProductDetailFragment(id)
+                    Navigation.findNavController(it).navigate(action)
+                }
+            }
+
+            if(produk.status.equals("1") && produk.qty != 0 || produk.status.equals("1") && produk.qty == 0){
+                txtStatusProduk.visibility = View.VISIBLE
+                txtStatusProduk.setText("Produk Tidak Tersedia")
+                txtStatusProduk.setTextColor(Color.RED)
+                imageProduct.colorFilter = colorFilter
+                if(role == Role.Admin.name){
+                    cardViewProduk.setOnClickListener {
+                        val action = KolamDetailFragmentDirections.actionProductDetailFragment(id)
+                        Navigation.findNavController(it).navigate(action)
+                    }
+                }else{
+                    cardViewProduk.setOnClickListener {
+                        Toast.makeText(context, "Tidak Tersedia",Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
