@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import id.web.devin.mvckolam.R
 import id.web.devin.mvckolam.controller.ProfileController
@@ -82,6 +83,29 @@ class PasswordEditFragment : Fragment(),ProfilView {
                     setPositiveButton("OK", null)
                     create().show()
                 }
+            }
+        }
+        b.btnBatalEditKataSandi.setOnClickListener {
+            AlertDialog.Builder(context).apply {
+                val title = SpannableString("Peringatan")
+                title.setSpan(AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, title.length, 0)
+                val message = SpannableString("Batal Melakukan Perubahan?")
+                message.setSpan(
+                    AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                    0,
+                    message.length,
+                    0
+                )
+                setTitle(title)
+                setMessage(message)
+                setPositiveButton("BATAL"){ dialog,_->
+                    val action = PasswordEditFragmentDirections.actionEditPwdToItemDataDiri()
+                    Navigation.findNavController(it).navigate(action)
+                }
+                setNegativeButton("TIDAK"){ dialog,_->
+                    dialog.dismiss()
+                }
+                create().show()
             }
         }
     }
